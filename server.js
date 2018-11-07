@@ -25,11 +25,12 @@ app.get("/scrape", function(req, res) {
     axios.get("https://www.premierleague.com/news/").then(function(response) {
 
         var $ = cheerio.load(response.data);
-        $("li section").each(function(i, element) {
+        $("li section div").each(function(i, element) {
             console.log(element)
             var result = {};
             result.title = $(this)
                 .children("a")
+                .hasClass("title")
                 .text();
             result.link = $(this)
                 .children("a")
@@ -40,14 +41,16 @@ app.get("/scrape", function(req, res) {
             result.text = $(this)
                 .children("span")
                 .attr("text");
-            // db.Article.create(result)
-            // .then(function(dbArticle) {
-            //     console.log(dbArticle);
-            // })
-            // .catch(function(err) {
-            //     return res.json(err);
-            // });
-            console.log(result)
+
+            db.Article.create(result)
+            .then(function(dbArticle) {
+                console.log(dbArticle);
+            })
+            .catch(function(err) {
+                return res.json(err);
+            });
+            // console.log(result)
+
         });
 
         res.send("Scrape Complete");
