@@ -26,6 +26,7 @@ app.get("/scrape", function(req, res) {
 
         var $ = cheerio.load(response.data);
         $("li section").each(function(i, element) {
+            console.log(element)
             var result = {};
             result.title = $(this)
                 .children("a")
@@ -33,11 +34,25 @@ app.get("/scrape", function(req, res) {
             result.link = $(this)
                 .children("a")
                 .attr("href");
+            result.img = $(this)
+                .children("img")
+                .attr("src");
+            result.text = $(this)
+                .children("span")
+                .attr("text");
+            // db.Article.create(result)
+            // .then(function(dbArticle) {
+            //     console.log(dbArticle);
+            // })
+            // .catch(function(err) {
+            //     return res.json(err);
+            // });
+            console.log(result)
         });
 
         res.send("Scrape Complete");
     });
-    
+
 }); 
 
 app.get("/articles", function(req, res) {
