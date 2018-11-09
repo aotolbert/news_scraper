@@ -30,14 +30,14 @@ app.get("/scrape", function(req, res) {
             var result = {};
             result.title = $(this)
                 .children("a")
-                .hasClass("title")
                 .text();
             result.link = $(this)
                 .children("a")
-                .attr("href");
+                .attr("href")
             result.img = $(this)
                 .children("img")
                 .attr("src");
+            
             result.text = $(this)
                 .children("span")
                 .attr("text");
@@ -67,6 +67,30 @@ app.get("/articles", function(req, res) {
         res.json(err);
       });
   });
+
+app.post("/articles/:id/", function(req, res) {
+    console.log(req.body)
+    var dbNote = req.body;
+
+    db.Note.create(req.body)
+ 
+        .then(function(dbNote) {
+            console.log("*****DBNote", dbNote)
+            return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true });
+                })    
+        .then(function(dbArticle) {
+            // If we were able to successfully update an Article, send it back to the client
+            res.json(dbArticle);
+          })
+          .catch(function(err) {
+            // If an error occurred, send it to the client
+            res.json(err);
+          });
+
+    // console.log("!!!!!!!!!!" + req.body.note)
+    // db.Article.findOneAndUpdate({_id: req.params.id}, {note: req.body.note}, {new: true})
+    // res.json(req.body)
+})
   
 
   app.listen(PORT, function() {
